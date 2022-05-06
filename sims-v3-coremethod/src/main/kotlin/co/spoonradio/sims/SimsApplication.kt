@@ -17,3 +17,6 @@ class SimsApplication
 fun main(args: Array<String>) {
     runApplication<SimsApplication>(*args)
 }
+fun test(){
+    println("테스트용입니다.")
+}
