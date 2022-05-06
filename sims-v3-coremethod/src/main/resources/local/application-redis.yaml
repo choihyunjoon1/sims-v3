@@ -1,0 +1,8 @@
+spring:
+  redis:
+    host: ${APPLICATION/SIMS-API/SIMS_REDIS_HOST:localhost}
+    port: ${APPLICATION/SIMS-API/SIMS_REDIS_PORT:7379}
+event:
+  redis:
+    host: ${EVENT-QUEUE-REDIS/HOST:localhost}
+    port: ${EVENT-QUEUE-REDIS/PORT:7380}

@@ -1,0 +1,26 @@
+aws:
+  region: ${AWS_REGION:ap-northeast-2}
+  credentials:
+    enabled: true
+    mode: ${AWS_CREDENTIALS_MODE:static}
+    static:
+      access-key: ${AWS_ACCESS_KEY:AKIA3PDTD5Q66TMP5TLZ}
+      secret-key: ${AWS_SECRET_KEY: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}
+
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    s3:
+      buckets:
+        contents: ${APPLICATION/SIMS-API/S3_BUCKET_CONTENTS:dev-kor-contents-s3}
+        static: ${APPLICATION/SIMS-API/S3_BUCKET_STATIC:dev-kor-static-s3}
+        private: ${APPLICATION/SIMS-API/S3_BUCKET_PRIVATE:dev-privacy-s3}
+        sims: ${APPLICATION/SIMS-API/S3_BUCKET_SIMS:sims-v3-s3-test}
+    lambda:
+      base-url: ${APPLICATION/SIMS-API/LAMBDA_BASE_URL:https://9321veh4l7.execute-api.ap-northeast-2.amazonaws.com/dev}
+      api-key: ${APPLICATION/SIMS-API/LAMBDA_API_KEY:ONCBPKRa3Y2of0O0NSAJ63kNVDFhVv1L5KKBRjZF}
+    secret-manager:
+      billing-secret-store: ${APPLICATION/SIMS-API/BILLING_SECRET_STORE:dev-apne2-kr-billings-secrets}

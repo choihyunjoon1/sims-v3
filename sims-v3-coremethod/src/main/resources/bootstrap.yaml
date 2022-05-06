@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: ${APPLICATION_NAME:sims}
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 1536KB
+      max-request-size: 1536KB
+  jmx:
+    enabled: false
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  port: 8880
+  servlet:
+    context-path: /v3/sims
+  ssl:
+    enabled: false
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    org.apache.kafka.clients.consumer.ConsumerConfig: WARN
+    org.apache.kafka.clients.producer.ProducerConfig: WARN
+    org.apache.kafka.clients.admin.AdminClientConfig: WARN
+    #org.apache.kafka: WARN
+    org.springframework.kafka: WARN
+    #sun.rmi: WARN
+---
+spring:
+  config:
+    activate.on-profile: "!default"
+  cloud:
+    config:
+      profile: ${ACTIVE_PROFILES:aws,jooq,redis,sims,${AWS_REGION:}}
+      uri: ${CONFIG_SERVER_URL:http://localhost:8080}
+      fail-fast: true
+---
+spring:
+  config:
+    activate.on-profile: default
+  config.location: optional:classpath:local/

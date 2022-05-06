@@ -1,0 +1,13 @@
+sims:
+  env:
+    balance: ${APPLICATION/SIMS-API/BALANCE_URL:http://kr-balance-api.devspoon.net/v1/balance}
+    spooncast: ${APPLICATION/SIMS-API/SPOONCAST_URL:https://kr-api.devspoon.net}
+    okta-metadata-path: ${APPLICATION/SIMS-API/OKTA_METADATA_PATH:https://spoonradio.okta.com/app/exk535ji0cWdAENiF4x7/sso/saml/metadata}
+    billing-url: ${APPLICATION/SIMS-API/BILLING_URL:https://kr-billing-api.devspoon.net/v1/billing}
+    billing-api-key: ${APPLICATION/SIMS-API/BILLING_API_KEY:93f09179-3d2a-4504-8f1e-db1ff54fa7cb}
+    download-url: ${APPLICATION/SIMS-API/DOWNLOAD_URL:https://kr-sims.devspoon.net/v2/Download/}
+    payoneer-url: ${APPLICATION/SIMS-API/PAYONEER_URL:https://api.sandbox.payoneer.com/v2/programs}
+    payoneer-program-id: ${APPLICATION/SIMS-API/PAYONEER_PROGRAM_ID:100103210}
+    payoneer-auth-token: ${APPLICATION/SIMS-API/PAYONEER_AUTH_TOKEN:Basic U3Bvb24zMjEwOm15a29vbjA1MTMh}
+    billing-aes-cipher-key: ${APPLICATION/SIMS-API/BILLING_AES_CIPHER_KEY:u-THYmuARq3qHlDQT9FGHwUpqt1yDNV_VfebFqA4PdQ=}
+    admin-email: ${APPLICATION/SIMS-API/ADMIN_EMAIL:sims-master@spoonradio.co}

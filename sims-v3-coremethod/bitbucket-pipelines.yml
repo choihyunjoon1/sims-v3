@@ -1,0 +1,113 @@
+image: gradle:7-jdk8-hotspot
+
+aliases:
+  - &initialize-application |
+    export PROJECT_NAME=sims
+    export APP_NAME=sims-api
+    export PRIVATE_GRADLE_URL=${PRIVATE_GRADLE_URL}
+    export PRIVATE_MAVEN_URL=${PRIVATE_MAVEN_URL}
+    export PRIVATE_MAVEN_USER=${PRIVATE_MAVEN_USER}
+    export PRIVATE_MAVEN_TOKEN=${PRIVATE_MAVEN_TOKEN}
+
+  - &initialize-dev |
+    export HARBOR_SPOONRADIO_URL=${HARBOR_SPOONRADIO_TBD_URL}
+    export HARBOR_SPOONRADIO_PSW=${HARBOR_SPOONRADIO_TBD_PSW}
+    export HARBOR_SPOONRADIO_USR=${HARBOR_SPOONRADIO_TBD_USR}
+
+  - &initialize-staging |
+    export HARBOR_SPOONRADIO_URL=${HARBOR_SPOONRADIO_STG_URL}
+    export HARBOR_SPOONRADIO_PSW=${HARBOR_SPOONRADIO_STG_PSW}
+    export HARBOR_SPOONRADIO_USR=${HARBOR_SPOONRADIO_STG_USR}
+
+  - &initialize-prod |
+    export HARBOR_SPOONRADIO_URL=${HARBOR_SPOONRADIO_PRD_URL}
+    export HARBOR_SPOONRADIO_PSW=${HARBOR_SPOONRADIO_PRD_PSW}
+    export HARBOR_SPOONRADIO_USR=${HARBOR_SPOONRADIO_PRD_USR}
+
+definitions:
+  services:
+    docker:
+      memory: 2048
+  caches:
+    gradlewrapper: ~/.gradle/wrapper
+  steps:
+    - step: &test
+        name: Test
+        caches:
+          - gradle
+          - gradlewrapper
+        script:
+          - export TESTCONTAINERS_RYUK_DISABLED=true
+          - ./gradlew clean test --stacktrace --no-watch-fs -PprivateGradleUrl=${PRIVATE_GRADLE_URL} -PprivateMavenUrl=${PRIVATE_MAVEN_URL} -PprivateMavenUser=${PRIVATE_MAVEN_USER} -PprivateMavenToken=${PRIVATE_MAVEN_TOKEN}
+        services:
+          - docker
+        artifacts:
+          - build/reports/tests/**
+    - step: &build
+        size: 2x
+        name: Build Docker image
+        caches:
+          - gradle
+          - gradlewrapper
+        script:
+          - ./gradlew clean assemble --refresh-dependencies --no-watch-fs --no-daemon -PprivateGradleUrl=${PRIVATE_GRADLE_URL} -PprivateMavenUrl=${PRIVATE_MAVEN_URL} -PprivateMavenUser=${PRIVATE_MAVEN_USER} -PprivateMavenToken=${PRIVATE_MAVEN_TOKEN}
+        services:
+          - docker
+        artifacts:
+          - build/libs/*.jar
+    - step: &deploy-development-step
+        name: Push to registry - Development
+        script:
+          - *initialize-application
+          - *initialize-dev
+          - export IMAGE_NAME=${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:$BITBUCKET_BRANCH
+          - docker build -t $IMAGE_NAME .
+          - docker login https://${HARBOR_SPOONRADIO_URL} --username ${HARBOR_SPOONRADIO_USR} --password ${HARBOR_SPOONRADIO_PSW}
+          - docker push $IMAGE_NAME
+          - docker tag $IMAGE_NAME ${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:latest
+          - docker push ${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:latest
+        services:
+          - docker
+    - step: &deploy-staging-step
+        name: Push to registry - Staging
+        script:
+          - *initialize-application
+          - *initialize-staging
+          - export IMAGE_NAME=${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:$BITBUCKET_BRANCH
+          - docker build -t $IMAGE_NAME .
+          - docker login https://${HARBOR_SPOONRADIO_URL} --username ${HARBOR_SPOONRADIO_USR} --password ${HARBOR_SPOONRADIO_PSW}
+          - docker push $IMAGE_NAME
+          - docker tag $IMAGE_NAME ${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:latest
+          - docker push ${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:latest
+        services:
+          - docker
+    - step: &deploy-production-step
+        name: Push to registry - Production
+        script:
+          - *initialize-application
+          - *initialize-prod
+          - export IMAGE_NAME=${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:$BITBUCKET_BRANCH
+          - docker build -t $IMAGE_NAME .
+          - docker login https://${HARBOR_SPOONRADIO_URL} --username ${HARBOR_SPOONRADIO_USR} --password ${HARBOR_SPOONRADIO_PSW}
+          - docker push $IMAGE_NAME
+          - docker tag $IMAGE_NAME ${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:latest
+          - docker push ${HARBOR_SPOONRADIO_URL}/${PROJECT_NAME}/${APP_NAME}:latest
+        services:
+          - docker
+
+pipelines:
+  custom: # Pipelines that can only be triggered manually
+    tbd:
+      - step: *build
+      - step: *deploy-development-step
+      # deployment: Test #환경 별로 변수를 따로 주고 싶을 때 >Repository Setting > PIPELINES > Developments 에 추가할 것
+    stg:
+      - step: *build
+      - step: *deploy-staging-step
+    prd:
+      - step: *build
+      - step: *deploy-production-step
+  tags:           # add the 'tags' section
+    release-*:    # specify the tag
+      - step: *build    # define the build pipeline for the tag
+      - step: *deploy-production-step

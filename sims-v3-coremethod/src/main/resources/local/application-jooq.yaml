@@ -1,0 +1,17 @@
+sims:
+  jdbc:
+    mysql:
+      url: jdbc:mysql://${INTERNALSERVICE/INTERNALUSER/HOST:localhost}:${INTERNALSERVICE/INTERNALUSER/PORT:3307}/SIMS?characterEncoding=utf8&useLegacyDatetimeCode=false
+      username: ${INTERNALSERVICE/INTERNALUSER/USERNAME:root}
+      password: ${INTERNALSERVICE/INTERNALUSER/PASSWORD:1234}
+      driverClassName: com.mysql.cj.jdbc.Driver
+    postgresql:
+      url: jdbc:postgresql://${POSTGRESQL/SPOONUSER/HOST:localhost}:${POSTGRESQL/SPOONUSER/PORT:5432}/spooncast
+      username: ${POSTGRESQL/SPOONUSER/USERNAME:postgres}
+      password: ${POSTGRESQL/SPOONUSER/PASSWORD:1234}
+      driverClassName: org.postgresql.Driver
+    billing:
+      url: jdbc:mysql://${BILLING/BILLINGUSER/HOST:localhost}:${BILLING/BILLINGUSER/PORT:3308}/Billing?characterEncoding=utf8
+      username: ${BILLING/BILLINGUSER/USERNAME:root}
+      password: ${BILLING/BILLINGUSER/PASSWORD:1234}
+      driverClassName: com.mysql.cj.jdbc.Driver

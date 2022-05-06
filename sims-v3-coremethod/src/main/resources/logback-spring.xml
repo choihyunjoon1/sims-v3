@@ -1,0 +1,41 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty scope="context" name="LOGGING_TYPE" source="logging.type" defaultValue="console"/>
+
+    <if condition='p("LOGGING_TYPE").contains("json")'>
+        <then>
+            <appender name="CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+                <target>System.out</target>
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                    <includeCallerData>true</includeCallerData>
+                    <fieldNames class="net.logstash.logback.fieldnames.ShortenedFieldNames"/>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <appender name="CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                    <charset>utf8</charset>
+                </encoder>
+            </appender>
+        </else>
+    </if>
+
+    <logger name="org.jooq" level="debug">
+        <appender-ref ref="CONSOLE_APPENDER"/>
+    </logger>
+
+    <logger name="feign.Logger" level="DEBUG">
+        <appender-ref ref="CONSOLE_APPENDER"/>
+    </logger>
+
+    <logger name="jsonLogger" additivity="false" level="DEBUG">
+        <appender-ref ref="CONSOLE_APPENDER"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_APPENDER"/>
+    </root>
+
+</configuration>

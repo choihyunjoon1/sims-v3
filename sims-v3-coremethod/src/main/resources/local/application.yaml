@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ${APPLICATION_NAME:sims}
+  profiles:
+    active: aws,jooq,redis,local,sims
+  main:
+    allow-bean-definition-overriding: true
+
+#jwk:
+#  url: "https://kr-auth.stgspoon.com/auth/keys/"
