@@ -19,4 +19,6 @@ fun main(args: Array<String>) {
 }
 fun test(){
     println("테스트용입니다.")
+    println("테스트용입니다.2")
+
 }
